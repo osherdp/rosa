@@ -2333,7 +2333,7 @@ func run(cmd *cobra.Command, _ []string) {
 			isBalancingIgnoredLabelsSet := cmd.Flags().Changed("balancing-ignored-labels")
 			if interactive.Enabled() && !isBalancingIgnoredLabelsSet {
 				balancingIgnoredLabelsInput, err := interactive.GetString(interactive.Input{
-					Question: "Labels that cluster autoscaler should ignore when considering node group similarity.",
+					Question: "Labels that cluster autoscaler should ignore when considering node group similarity",
 					Help:     cmd.Flags().Lookup("balancing-ignored-labels").Usage,
 					Default:  strings.Join(args.balancingIgnoredLabels, ","),
 					Required: false,
@@ -2352,7 +2352,7 @@ func run(cmd *cobra.Command, _ []string) {
 			isIgnoreDaemonsetsUtilizationSet := cmd.Flags().Changed("ignore-daemonsets-utilization")
 			if interactive.Enabled() && !isIgnoreDaemonsetsUtilizationSet && !ignoreDaemonsetsUtilization {
 				ignoreDaemonsetsUtilization, err = interactive.GetBool(interactive.Input{
-					Question: "Ignore Daemonsets Utilization",
+					Question: "Ignore daemonsets utilization",
 					Help:     cmd.Flags().Lookup("ignore-daemonsets-utilization").Usage,
 					Default:  false,
 					Required: false,
@@ -2366,12 +2366,12 @@ func run(cmd *cobra.Command, _ []string) {
 			isMaxNodeProvisionTimeSet := cmd.Flags().Changed("max-node-provision-time")
 			if interactive.Enabled() && !isMaxNodeProvisionTimeSet {
 				maxNodeProvisionTime, err = interactive.GetString(interactive.Input{
-					Question: "Max Node Provision Time",
+					Question: "Maximum node provision time",
 					Help:     cmd.Flags().Lookup("max-node-provision-time").Usage,
 					Required: false,
 					Default:  maxNodeProvisionTime,
 					Validators: []interactive.Validator{
-						timeStringValidator,
+						durationStringValidator,
 					},
 				})
 				if err != nil {
@@ -2379,7 +2379,7 @@ func run(cmd *cobra.Command, _ []string) {
 					os.Exit(1)
 				}
 			}
-			if err := timeStringValidator(maxNodeProvisionTime); err != nil {
+			if err := durationStringValidator(maxNodeProvisionTime); err != nil {
 				r.Reporter.Errorf("%s", err)
 				os.Exit(1)
 			}
@@ -2437,7 +2437,7 @@ func run(cmd *cobra.Command, _ []string) {
 			isMinCoresSet := cmd.Flags().Changed("min-cores")
 			if interactive.Enabled() && !isMinCoresSet {
 				minCores, err = interactive.GetInt(interactive.Input{
-					Question: "Minimum number of cores to deploy in cluster.",
+					Question: "Minimum number of cores to deploy in cluster",
 					Help:     cmd.Flags().Lookup("min-cores").Usage,
 					Required: false,
 					Default:  minCores,
@@ -2459,7 +2459,7 @@ func run(cmd *cobra.Command, _ []string) {
 			isMaxCoresSet := cmd.Flags().Changed("max-cores")
 			if interactive.Enabled() && !isMaxCoresSet {
 				maxCores, err = interactive.GetInt(interactive.Input{
-					Question: "Maximum number of cores to deploy in cluster.",
+					Question: "Maximum number of cores to deploy in cluster",
 					Help:     cmd.Flags().Lookup("max-cores").Usage,
 					Required: false,
 					Default:  maxCores,
@@ -2481,10 +2481,10 @@ func run(cmd *cobra.Command, _ []string) {
 			isMinMemorySet := cmd.Flags().Changed("min-memory")
 			if interactive.Enabled() && !isMinMemorySet {
 				minMemory, err = interactive.GetInt(interactive.Input{
-					Question: "Minimum amount of memory, in GiB, in the cluster.",
+					Question: "Minimum amount of memory, in GiB, in the cluster",
 					Help:     cmd.Flags().Lookup("min-memory").Usage,
 					Required: false,
-					Default:  maxCores,
+					Default:  minMemory,
 					Validators: []interactive.Validator{
 						intValidator,
 					},
@@ -2501,7 +2501,7 @@ func run(cmd *cobra.Command, _ []string) {
 
 			isMaxMemorySet := cmd.Flags().Changed("max-memory")
 			if interactive.Enabled() && !isMaxMemorySet {
-				minMemory, err = interactive.GetInt(interactive.Input{
+				maxMemory, err = interactive.GetInt(interactive.Input{
 					Question: "Maximum amount of memory, in GiB, in the cluster",
 					Help:     cmd.Flags().Lookup("max-memory").Usage,
 					Required: false,
@@ -2525,7 +2525,7 @@ func run(cmd *cobra.Command, _ []string) {
 			isScaleDownEnabledSet := cmd.Flags().Changed("scale-down-enabled")
 			if interactive.Enabled() && !scaleDownEnabled && !isScaleDownEnabledSet {
 				scaleDownEnabled, err = interactive.GetBool(interactive.Input{
-					Question: "Maximum amount of GPUs in the cluster",
+					Question: "Should scale-down be enabled",
 					Help:     cmd.Flags().Lookup("scale-down-enabled").Usage,
 					Default:  scaleDownEnabled,
 					Required: false,
@@ -2539,12 +2539,12 @@ func run(cmd *cobra.Command, _ []string) {
 			isScaleDownUnneededTimeSet := cmd.Flags().Changed("scale-down-unneeded-time")
 			if interactive.Enabled() && !isScaleDownUnneededTimeSet && scaleDownUnneededTime == "" {
 				scaleDownUnneededTime, err = interactive.GetString(interactive.Input{
-					Question: "How long a node should be unneeded before it is eligible for scale down.",
+					Question: "How long a node should be unneeded before it is eligible for scale down",
 					Help:     cmd.Flags().Lookup("scale-down-unneeded-time").Usage,
 					Default:  scaleDownUnneededTime,
 					Required: false,
 					Validators: []interactive.Validator{
-						timeStringValidator,
+						durationStringValidator,
 					},
 				})
 				if err != nil {
@@ -2552,7 +2552,7 @@ func run(cmd *cobra.Command, _ []string) {
 					os.Exit(1)
 				}
 
-				if err := timeStringValidator(scaleDownUnneededTime); err != nil {
+				if err := durationStringValidator(scaleDownUnneededTime); err != nil {
 					r.Reporter.Errorf("Expected a valid value for scale-down-unneeded-time: %s", err)
 					os.Exit(1)
 				}
@@ -2562,8 +2562,8 @@ func run(cmd *cobra.Command, _ []string) {
 			if interactive.Enabled() && !isScaleDownUtilizationThresholdSet && scaleDownUtilizationThreshold == 0 {
 				scaleDownUtilizationThreshold, err = interactive.GetFloat(interactive.Input{
 					Question: "Node utilization level, defined as sum of requested resources divided by capacity, " +
-						"below which a node can be considered for scale down.",
-					Help:     cmd.Flags().Lookup("scale-down-delay-after-add").Usage,
+						"below which a node can be considered for scale down",
+					Help:     cmd.Flags().Lookup("scale-down-utilization-threshold").Usage,
 					Default:  scaleDownUtilizationThreshold,
 					Required: false,
 					Validators: []interactive.Validator{
@@ -2579,12 +2579,12 @@ func run(cmd *cobra.Command, _ []string) {
 			isScaleDownDelayAfterAddSet := cmd.Flags().Changed("scale-down-delay-after-add")
 			if interactive.Enabled() && !isScaleDownDelayAfterAddSet && scaleDownDelayAfterAdd == "" {
 				scaleDownDelayAfterAdd, err = interactive.GetString(interactive.Input{
-					Question: "How long after scale up should scale down evaluation resume.",
+					Question: "How long after scale up should scale down evaluation resume",
 					Help:     cmd.Flags().Lookup("scale-down-delay-after-add").Usage,
 					Default:  scaleDownDelayAfterAdd,
 					Required: false,
 					Validators: []interactive.Validator{
-						timeStringValidator,
+						durationStringValidator,
 					},
 				})
 				if err != nil {
@@ -2593,7 +2593,7 @@ func run(cmd *cobra.Command, _ []string) {
 				}
 			}
 
-			if err := timeStringValidator(scaleDownDelayAfterAdd); err != nil {
+			if err := durationStringValidator(scaleDownDelayAfterAdd); err != nil {
 				r.Reporter.Errorf("Expected a valid value for scale-down-delay-after-add: %s", err)
 				os.Exit(1)
 			}
@@ -2601,12 +2601,12 @@ func run(cmd *cobra.Command, _ []string) {
 			isScaleDownDelayAfterDeleteSet := cmd.Flags().Changed("scale-down-delay-after-delete")
 			if interactive.Enabled() && !isScaleDownDelayAfterDeleteSet && scaleDownDelayAfterDelete == "" {
 				scaleDownDelayAfterDelete, err = interactive.GetString(interactive.Input{
-					Question: "How long after node deletion should scale down evaluation resume.",
+					Question: "How long after node deletion should scale down evaluation resume",
 					Help:     cmd.Flags().Lookup("scale-down-delay-after-delete").Usage,
 					Default:  scaleDownDelayAfterDelete,
 					Required: false,
 					Validators: []interactive.Validator{
-						timeStringValidator,
+						durationStringValidator,
 					},
 				})
 				if err != nil {
@@ -2614,7 +2614,7 @@ func run(cmd *cobra.Command, _ []string) {
 					os.Exit(1)
 				}
 
-				if err := timeStringValidator(scaleDownDelayAfterDelete); err != nil {
+				if err := durationStringValidator(scaleDownDelayAfterDelete); err != nil {
 					r.Reporter.Errorf("Expected a valid value for scale-down-delay-after-delete: %s", err)
 					os.Exit(1)
 				}
@@ -2628,7 +2628,7 @@ func run(cmd *cobra.Command, _ []string) {
 					Default:  scaleDownDelayAfterFailure,
 					Required: false,
 					Validators: []interactive.Validator{
-						timeStringValidator,
+						durationStringValidator,
 					},
 				})
 				if err != nil {
@@ -2636,7 +2636,7 @@ func run(cmd *cobra.Command, _ []string) {
 					os.Exit(1)
 				}
 
-				if err := timeStringValidator(scaleDownDelayAfterDelete); err != nil {
+				if err := durationStringValidator(scaleDownDelayAfterFailure); err != nil {
 					r.Reporter.Errorf("Expected a valid value for scale-down-delay-after-failure: %s", err)
 					os.Exit(1)
 				}
@@ -3436,9 +3436,19 @@ func zeroToOneFloatValidator(val interface{}) error {
 	return nil
 }
 
-func timeStringValidator(val interface{}) error {
+func durationStringValidator(val interface{}) error {
+	input, ok := val.(string)
+
+	if !ok {
+		return fmt.Errorf("Can only validate strings, got %v", val)
+	}
+
+	if input == "" {
+		return nil
+	}
+
 	re := regexp.MustCompile("^([0-9]+(.[0-9]+)?(ns|us|µs|ms|s|m|h))+$")
-	regexPass := re.MatchString(val.(string))
+	regexPass := re.MatchString(input)
 	if !regexPass {
 		return fmt.Errorf("Expecting an integer plus unit of time (without spaces). " +
 			"Options for time units include: ns, us, µs, ms, s, m, h. Examples: 2000000ns, 180s, 2m, etc.")
